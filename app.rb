@@ -12,5 +12,5 @@ get '/about' do
 end
 
 get '/signin' do
-  "Hello World"
+	erb :signin
 end
