@@ -1,18 +1,18 @@
-<form action="\signin" method="post">
+<form action="/signin" method="post">
   
   <div class="form-group">
     <label for="exampleInputEmail1">Ваше имя</label>
-    <input name="name" type="text"  class="form-control" placeholder="введите имя">
+    <input name="name" type="text" class="form-control" placeholder="введите имя" value="<%= @name %>">
   </div>
   
   <div class="form-group">
     <label>Ваш телефон</label>
-    <input name="phone" type="text" class="form-control" placeholder="введите телефон">
+    <input name="phone" type="text" class="form-control" placeholder="введите телефон" value="<%= @phone %>">
   </div>
 
   <div class="form-group">
     <label>Когда вас ждать</label>
-    <input name="datetime" type="text" class="form-control" placeholder="введите дату и время" id="datetimepicker">
+    <input name="datetime" type="text" class="form-control" placeholder="введите дату и время" id="datetimepicker" value="<%= @datetime %>">
   </div>
 
   <div class="form-group">
