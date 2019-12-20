@@ -1,25 +1,31 @@
-#encoding: utf-8
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader'
 require 'sqlite3'
 
-def is_barber_exists? db, barber_name
-	db.execute('SELECT * FROM Barbers WHERE Barber=?', [barber_name]).length > 0
+def is_barber_exists? db, name
+	db.execute('select * from Barbers where Barber=?', [name]).length > 0
 end
 
 def seed_db db, barbers
+
 	barbers.each do |barber|
 		if !is_barber_exists? db, barber
-			db.execute 'INSERT INTO Barbers (Barber) VALUES (?)', [barber]
-		end
+			db.execute 'insert into Barbers (Barber) values (?)', [barber]
+		end 
 	end
+
 end
 
 def get_db
-	db = SQLite3::Database.new('barbershop.db')
+	db = SQLite3::Database.new 'barbershop.db'
 	db.results_as_hash = true
 	return db
+end
+
+before do
+	db = get_db
+	@barbers = db.execute 'select * from Barbers'
 end
 
 configure do
@@ -28,21 +34,21 @@ configure do
 		"Users"
 		(
 			"Id" INTEGER PRIMARY KEY AUTOINCREMENT,
-			"Name" TEXT,
+			"Username" TEXT,
 			"Phone" TEXT,
 			"DateStamp" TEXT,
 			"Barber" TEXT,
 			"Color" TEXT
 		)'
-	db = get_db	
+
 	db.execute 'CREATE TABLE IF NOT EXISTS
 		"Barbers"
-		(	
-			"Id" INTEGER PRIMARY KEY AUTOINCREMENT,
+		(
+			"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 			"Barber" TEXT
 		)'
-	seed_db db, ['Рон Алпен', 'Петер Луст', 'Джон Коннор', 'Том Рой']
-	db.close
+
+	seed_db db, ['Jessie Pinkman', 'Walter White', 'Gus Fring', 'Mike Ehrmantraut']
 end
 
 get '/' do
@@ -50,7 +56,7 @@ get '/' do
 end
 
 get '/about' do
-  erb "<h1>Мы лучшие!</h1>"
+	erb '<h2>Мы лучшие</h2>'
 end
 
 get '/signin' do
@@ -58,22 +64,27 @@ get '/signin' do
 end
 
 post '/signin' do
+
 	@name = params[:name]
 	@phone = params[:phone]
 	@datetime = params[:datetime]
 	@barber = params[:barber]
 	@color = params[:colorpicker]
 
-	arr = [@name, @phone, @datetime, @barber, @color]
+	# хеш
+	hh = { 	:name => 'Введите имя',
+			:phone => 'Введите телефон',
+			:datetime => 'Введите дату и время' }
 
-	arr.each do |item|
-		if item == ''
-			@error = 'Все поля должны быть заполнены!'
-			return erb :signin
-		end
+	@error = hh.select {|key,_| params[key] == ""}.values.join(", ")
+
+	if @error != ''
+		return erb :signin
 	end
+
 	db = get_db
-	db.execute 'INSERT INTO "Users"
+	db.execute 'insert into
+		Users
 		(
 			Name,
 			Phone,
@@ -81,18 +92,16 @@ post '/signin' do
 			Barber,
 			Color
 		)
-		VALUES(?, ?, ?, ?, ?)', [@name, @phone, @datetime, @barber, @color]
-	db.close
+		values (?, ?, ?, ?, ?)', [@name, @phone, @datetime, @barber, @color]
 
+	erb "<h2>Спасибо, вы записались!</h2>"
+
+end
+
+get '/showusers' do
 	db = get_db
-	db.execute 'INSERT INTO "Barbers"
-		(
-			Barber
-		)
-		VALUES(?)', [@barber]
-	db.close
 
-	erb '<h2>Спасибо! Вы записаны!</h2>'
+	@results = db.execute 'select * from Users order by id desc'
 
-
+	erb :showusers
 end

@@ -1,7 +1,7 @@
 <form action="/signin" method="post">
   
   <div class="form-group">
-    <label for="exampleInputEmail1">Ваше имя</label>
+    <label>Ваше имя</label>
     <input name="name" type="text" class="form-control" placeholder="введите имя" value="<%= @name %>">
   </div>
   
@@ -17,10 +17,12 @@
 
   <div class="form-group">
     <label>Выбрать мастера</label>
-    <select name="barber" class="form-control">
-      <option>Рон Алпен</option>
-      <option>Петер Луст</option>
-      <option>Джон Коннор</option>      
+    <select name="barber" class="form-control" value="<%= @barber %>">
+      
+      <%@barbers.each do |item|%>
+        <option<%= @barber == item['Barber'] ? 'selected' : ''%>><%= item['Barber']%></option>
+      <%end%>      
+    
     </select>
   </div>
 
